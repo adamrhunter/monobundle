@@ -84,38 +84,26 @@ function getWorkspaces(from) {
         };
     });
 
-    for (const w of packages) {
-        console.log(w.name);
+    const pkgInfo = JSONFile.for(path.join(cwd, 'package.json'));
 
-        function replaceDependencies(dependencyType) {
-            const dependencies = w.pkgInfo.pkg[dependencyType];
+    function replaceDependencies(dependencyType) {
+        const dependencies = pkgInfo.pkg[dependencyType];
+        if (!dependencies) return;
 
-            if (!dependencies) return;
+        for (const p in dependencies) {
+            const linkedPackage = packages.find(wp => wp.name === p);
+            if (!linkedPackage) continue;
 
-            for (const p in dependencies) {
-                const linkedPackage = packages.find(wp => wp.name === p);
-                if (!linkedPackage) continue;
+            const slugifiedName = p.replace(/@/g, '').replace(/\//g, '-');
+            const packedFilename = path.join('./components', `${slugifiedName}-${linkedPackage.version}.tgz`);
 
-                const slugifiedName = p.replace(/@/g, '').replace(/\//g, '-');
-
-                let packedPath = '';
-
-                if (w.path.startsWith(cwd)) {
-                    packedPath = './components';
-                }
-
-                const packedFilename = path.join(packedPath, `${slugifiedName}-${linkedPackage.version}.tgz`);
-
-                console.log(`  setting resolution for ${p} to ${packedFilename}`);
-                w.pkgInfo.pkg.resolutions[p] = `file:${packedFilename}`;
-            }
+            console.log(`  setting resolution for ${p} to ${packedFilename}`);
+            pkgInfo.pkg.resolutions[p] = `file:${packedFilename}`;
         }
-
-        replaceDependencies('dependencies');
-        replaceDependencies('optionalDependencies');
     }
 
-    for (const w of packages) {
-        w.pkgInfo.write();
-    }
+    replaceDependencies('dependencies');
+    replaceDependencies('optionalDependencies');
+
+    pkgInfo.write();
 })();
