@@ -71,39 +71,51 @@ function getWorkspaces(from) {
 
 (async () => {
     const cwd = process.cwd();
-    const packageJson = JSONFile.for(path.join(cwd, 'package.json'));
-
     const workspaces = getWorkspaces(cwd);
 
     const packages = workspaces.map(w => {
-        const workspacePackageJson = require(path.join(w, 'package.json'));
+        const pkgInfo = JSONFile.for(path.join(w, 'package.json'));
 
         return {
             path: w,
-            name: workspacePackageJson.name,
-            version: workspacePackageJson.version
+            name: pkgInfo.pkg.name,
+            version: pkgInfo.pkg.version,
+            pkgInfo
         };
-    }).filter(p => p.name !== packageJson.name);
+    });
 
-    function replaceDependencies(dependencyType) {
-        const dependencies = packageJson.pkg[dependencyType];
+    for (const w of packages) {
+        console.log(w.name);
 
-        if (!dependencies) return;
+        function replaceDependencies(dependencyType) {
+            const dependencies = w.pkgInfo.pkg[dependencyType];
 
-        for (const p in dependencies) {
-            const linkedPackage = packages.find(wp => wp.name === p);
-            if (!linkedPackage) continue;
+            if (!dependencies) return;
 
-            const slugifiedName = p.replace(/@/g, '').replace(/\//g, '-');
-            const packedFilename = `${slugifiedName}-${linkedPackage.version}.tgz`;
+            for (const p in dependencies) {
+                const linkedPackage = packages.find(wp => wp.name === p);
+                if (!linkedPackage) continue;
 
-            console.log(`rewriting ${p} from ${dependencies[p]} to ${packedFilename}`);
-            dependencies[p] = `file:./components/${packedFilename}`;
+                const slugifiedName = p.replace(/@/g, '').replace(/\//g, '-');
+
+                let packedPath = '';
+
+                if (w.path.startsWith(cwd)) {
+                    packedPath = './components';
+                }
+
+                const packedFilename = path.join(packedPath, `${slugifiedName}-${linkedPackage.version}.tgz`);
+
+                console.log(`rewriting ${p} from ${dependencies[p]} to ${packedFilename}`);
+                dependencies[p] = `file:${packedFilename}`;
+            }
         }
+
+        replaceDependencies('dependencies');
+        replaceDependencies('optionalDependencies');
     }
 
-    replaceDependencies('dependencies');
-    replaceDependencies('optionalDependencies');
-
-    packageJson.write();
+    for (const w of packages) {
+        w.pkgInfo.write();
+    }
 })();
