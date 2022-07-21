@@ -97,6 +97,7 @@ function getWorkspaces(from) {
             const slugifiedName = p.replace(/@/g, '').replace(/\//g, '-');
             const packedFilename = `${slugifiedName}-${linkedPackage.version}.tgz`;
 
+            console.log(`rewriting ${p} from ${dependencies[p]} to ${packedFilename}`);
             dependencies[p] = `file:./components/${packedFilename}`;
         }
     }
