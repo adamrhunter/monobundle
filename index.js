@@ -106,8 +106,8 @@ function getWorkspaces(from) {
 
                 const packedFilename = path.join(packedPath, `${slugifiedName}-${linkedPackage.version}.tgz`);
 
-                console.log(`rewriting ${p} from ${dependencies[p]} to ${packedFilename}`);
-                dependencies[p] = `file:${packedFilename}`;
+                console.log(`  setting resolution for ${p} to ${packedFilename}`);
+                w.pkgInfo.pkg.resolutions[p] = `file:${packedFilename}`;
             }
         }
 
