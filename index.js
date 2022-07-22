@@ -71,8 +71,8 @@ function getWorkspaces(from) {
 
 (async () => {
     const cwd = process.cwd();
-    const workspaces = getWorkspaces(cwd);
     const pkgInfo = JSONFile.for(path.join(cwd, 'package.json'));
+    const workspaces = getWorkspaces(cwd).filter(w => !w.startsWith(cwd));
 
     for (const w of workspaces) {
         const workspacePkgInfo = JSONFile.for(path.join(w, 'package.json'));
