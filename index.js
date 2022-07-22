@@ -72,38 +72,16 @@ function getWorkspaces(from) {
 (async () => {
     const cwd = process.cwd();
     const workspaces = getWorkspaces(cwd);
-
-    const packages = workspaces.map(w => {
-        const pkgInfo = JSONFile.for(path.join(w, 'package.json'));
-
-        return {
-            path: w,
-            name: pkgInfo.pkg.name,
-            version: pkgInfo.pkg.version,
-            pkgInfo
-        };
-    });
-
     const pkgInfo = JSONFile.for(path.join(cwd, 'package.json'));
 
-    function replaceDependencies(dependencyType) {
-        const dependencies = pkgInfo.pkg[dependencyType];
-        if (!dependencies) return;
+    for (const w of workspaces) {
+        const workspacePkgInfo = JSONFile.for(path.join(w, 'package.json'));
+        const slugifiedName = workspacePkgInfo.pkg.name.replace(/@/g, '').replace(/\//g, '-');
+        const packedFilename = path.join('./components', `${slugifiedName}-${workspacePkgInfo.pkg.version}.tgz`);
 
-        for (const p in dependencies) {
-            const linkedPackage = packages.find(wp => wp.name === p);
-            if (!linkedPackage) continue;
-
-            const slugifiedName = p.replace(/@/g, '').replace(/\//g, '-');
-            const packedFilename = path.join('./components', `${slugifiedName}-${linkedPackage.version}.tgz`);
-
-            console.log(`  setting resolution for ${p} to ${packedFilename}`);
-            pkgInfo.pkg.resolutions[p] = `file:${packedFilename}`;
-        }
+        console.log(`  setting resolution for ${workspacePkgInfo.pkg.name} to ${packedFilename}`);
+        pkgInfo.pkg.resolutions[workspacePkgInfo.pkg.name] = `file:${packedFilename}`;
     }
-
-    replaceDependencies('dependencies');
-    replaceDependencies('optionalDependencies');
 
     pkgInfo.write();
 })();
