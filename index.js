@@ -77,10 +77,19 @@ function getWorkspaces(from) {
     for (const w of workspaces) {
         const workspacePkgInfo = JSONFile.for(path.join(w, 'package.json'));
         const slugifiedName = workspacePkgInfo.pkg.name.replace(/@/g, '').replace(/\//g, '-');
-        const packedFilename = path.join('./components', `${slugifiedName}-${workspacePkgInfo.pkg.version}.tgz`);
+        const packedFilename = `file:` + path.join('./components', `${slugifiedName}-${workspacePkgInfo.pkg.version}.tgz`);
 
         console.log(`  setting resolution for ${workspacePkgInfo.pkg.name} to ${packedFilename}`);
-        pkgInfo.pkg.resolutions[workspacePkgInfo.pkg.name] = `file:${packedFilename}`;
+
+        if (pkgInfo.pkg.dependencies[workspacePkgInfo.pkg.name]) {
+            pkgInfo.pkg.dependencies[workspacePkgInfo.pkg.name] = packedFilename;
+        }
+
+        if (pkgInfo.pkg.optionalDependencies[workspacePkgInfo.pkg.name]) {
+            pkgInfo.pkg.optionalDependencies[workspacePkgInfo.pkg.name] = packedFilename;
+        }
+
+        pkgInfo.pkg.resolutions[workspacePkgInfo.pkg.name] = packedFilename;
     }
 
     pkgInfo.write();
