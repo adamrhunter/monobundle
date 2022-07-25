@@ -8,6 +8,7 @@ const detectNewline = require('detect-newline');
 const findRoot = require('find-root');
 const flatten = require('flatten');
 const glob = require('glob');
+const ultraRunner = require('ultra-runner/lib/cli');
 
 const DETECT_TRAILING_WHITESPACE = /\s+$/;
 
@@ -98,4 +99,8 @@ function getWorkspaces(from) {
     }
 
     pkgInfo.write();
+
+    console.log('\n\n');
+
+    await ultraRunner.run(['' /* placeholder */, '' /* placeholder */, '--filter', '@tryghost/*', '-r', 'npm', 'pack', '--pack-destination', '../core/components']);
 })();
