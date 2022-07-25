@@ -6,7 +6,7 @@ const path = require('path');
 const detectIndent = require('detect-indent');
 const detectNewline = require('detect-newline');
 const findRoot = require('find-root');
-const flatten = require('flatten');
+const flatten = require('lodash.flattendeep');
 const glob = require('glob');
 const ultraRunner = require('ultra-runner/lib/cli');
 
