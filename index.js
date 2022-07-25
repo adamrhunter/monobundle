@@ -84,7 +84,7 @@ function getWorkspaces(from) {
         const slugifiedName = workspacePkgInfo.pkg.name.replace(/@/g, '').replace(/\//g, '-');
         const packedFilename = `file:` + path.join(bundlePath, `${slugifiedName}-${workspacePkgInfo.pkg.version}.tgz`);
 
-        console.log(`  setting override for ${workspacePkgInfo.pkg.name} to ${packedFilename}`);
+        console.log(`setting override for ${workspacePkgInfo.pkg.name} to ${packedFilename}`);
 
         if (pkgInfo.pkg.dependencies[workspacePkgInfo.pkg.name]) {
             pkgInfo.pkg.dependencies[workspacePkgInfo.pkg.name] = packedFilename;
