@@ -106,4 +106,5 @@ function getWorkspaces(from) {
 
     fs.copyFileSync('../../README.md', 'README.md');
     fs.copyFileSync('../../LICENSE', 'LICENSE');
+    fs.copyFileSync('../../PRIVACY.md', 'PRIVACY.md');
 })();
