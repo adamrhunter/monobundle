@@ -103,4 +103,6 @@ function getWorkspaces(from) {
     console.log('\n\n');
 
     await ultraRunner.run(['' /* placeholder */, '' /* placeholder */, '--filter', '@tryghost/*', '-r', 'npm', 'pack', '--pack-destination', '../core/components']);
+
+    fs.copyFileSync('../../README.md', 'README.md');
 })();
