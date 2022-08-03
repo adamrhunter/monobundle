@@ -82,6 +82,11 @@ function getWorkspaces(from) {
 
     for (const w of workspaces) {
         const workspacePkgInfo = JSONFile.for(path.join(w, 'package.json'));
+
+        if (!workspacePkgInfo.pkg.name.startsWith('@')) {
+            continue;
+        }
+
         const slugifiedName = workspacePkgInfo.pkg.name.replace(/@/g, '').replace(/\//g, '-');
         const packedFilename = `file:` + path.join(bundlePath, `${slugifiedName}-${workspacePkgInfo.pkg.version}.tgz`);
 
