@@ -90,16 +90,18 @@ function getWorkspaces(from) {
         const slugifiedName = workspacePkgInfo.pkg.name.replace(/@/g, '').replace(/\//g, '-');
         const packedFilename = `file:` + path.join(bundlePath, `${slugifiedName}-${workspacePkgInfo.pkg.version}.tgz`);
 
-        console.log(`setting override for ${workspacePkgInfo.pkg.name} to ${packedFilename}`);
 
         if (pkgInfo.pkg.dependencies[workspacePkgInfo.pkg.name]) {
+            console.log(`setting dependencies override for ${workspacePkgInfo.pkg.name} to ${packedFilename}`);
             pkgInfo.pkg.dependencies[workspacePkgInfo.pkg.name] = packedFilename;
         }
 
         if (pkgInfo.pkg.optionalDependencies[workspacePkgInfo.pkg.name]) {
+            console.log(`setting optionalDependencies override for ${workspacePkgInfo.pkg.name} to ${packedFilename}`);
             pkgInfo.pkg.optionalDependencies[workspacePkgInfo.pkg.name] = packedFilename;
         }
 
+        console.log(`setting resolution override for ${workspacePkgInfo.pkg.name} to ${packedFilename}`);
         pkgInfo.pkg.resolutions[workspacePkgInfo.pkg.name] = packedFilename;
     }
 
