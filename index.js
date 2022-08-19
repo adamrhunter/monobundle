@@ -73,6 +73,7 @@ function getWorkspaces(from) {
 (async () => {
     const cwd = process.cwd();
     const pkgInfo = JSONFile.for(path.join(cwd, 'package.json'));
+    const ghostVersion = pkgInfo.pkg.version;
     const workspaces = getWorkspaces(cwd).filter(w => !w.startsWith(cwd));
     const bundlePath = './components';
 
@@ -87,9 +88,11 @@ function getWorkspaces(from) {
             continue;
         }
 
+        workspacePkgInfo.pkg.version = ghostVersion;
+        workspacePkgInfo.write();
+
         const slugifiedName = workspacePkgInfo.pkg.name.replace(/@/g, '').replace(/\//g, '-');
         const packedFilename = `file:` + path.join(bundlePath, `${slugifiedName}-${workspacePkgInfo.pkg.version}.tgz`);
-
 
         if (pkgInfo.pkg.dependencies[workspacePkgInfo.pkg.name]) {
             console.log(`setting dependencies override for ${workspacePkgInfo.pkg.name} to ${packedFilename}`);
