@@ -72,7 +72,14 @@ function getWorkspaces(from) {
 
 (async () => {
     const cwd = process.cwd();
-    const pkgInfo = JSONFile.for(path.join(cwd, 'package.json'));
+    const nearestPkgJson = findRoot(cwd);
+    console.log(nearestPkgJson);
+    let pkgInfo = JSONFile.for(path.join(nearestPkgJson, 'package.json'));
+
+    if (pkgInfo.pkg.name !== 'ghost') {
+        pkgInfo = JSONFile.for(path.join(nearestPkgJson, 'ghost/core/package.json'));
+    }
+
     const ghostVersion = pkgInfo.pkg.version;
     const workspaces = getWorkspaces(cwd).filter(w => !w.startsWith(cwd));
     const bundlePath = './components';
