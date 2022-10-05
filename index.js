@@ -95,6 +95,10 @@ function getWorkspaces(from) {
             continue;
         }
 
+        if (!workspacePkgInfo.pkg.private) {
+            continue;
+        }
+
         workspacePkgInfo.pkg.version = ghostVersion;
         workspacePkgInfo.write();
 
@@ -113,26 +117,14 @@ function getWorkspaces(from) {
 
         console.log(`setting resolution override for ${workspacePkgInfo.pkg.name} to ${packedFilename}`);
         pkgInfo.pkg.resolutions[workspacePkgInfo.pkg.name] = packedFilename;
+
+        console.log(`packaging ${w}`);
+        await ultraRunner.run(['' /* placeholder */, '' /* placeholder */, '--filter', workspacePkgInfo.pkg.name, '-r', 'npm', 'pack', '--pack-destination', '../core/components']);
     }
 
     pkgInfo.write();
 
     console.log('\n\n');
-
-    for (const w of workspaces) {
-        console.log(`packaging ${w}`);
-        const workspacePkgInfo = JSONFile.for(path.join(w, 'package.json'));
-
-        if (!workspacePkgInfo.pkg.name.startsWith('@')) {
-            continue;
-        }
-
-        if (!workspacePkgInfo.pkg.private) {
-            continue;
-        }
-
-        await ultraRunner.run(['' /* placeholder */, '' /* placeholder */, '--filter', workspacePkgInfo.pkg.name, '-r', 'npm', 'pack', '--pack-destination', '../core/components']);
-    }
 
     fs.copyFileSync('../../README.md', 'README.md');
     fs.copyFileSync('../../LICENSE', 'LICENSE');
