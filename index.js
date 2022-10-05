@@ -119,7 +119,20 @@ function getWorkspaces(from) {
 
     console.log('\n\n');
 
-    await ultraRunner.run(['' /* placeholder */, '' /* placeholder */, '--filter', '@tryghost/*', '-r', 'npm', 'pack', '--pack-destination', '../core/components']);
+    for (const w of workspaces) {
+        console.log(`packaging ${w}`);
+        const workspacePkgInfo = JSONFile.for(path.join(w, 'package.json'));
+
+        if (!workspacePkgInfo.pkg.name.startsWith('@')) {
+            continue;
+        }
+
+        if (!workspacePkgInfo.pkg.private) {
+            continue;
+        }
+
+        await ultraRunner.run(['' /* placeholder */, '' /* placeholder */, '--filter', workspacePkgInfo.pkg.name, '-r', 'npm', 'pack', '--pack-destination', '../core/components']);
+    }
 
     fs.copyFileSync('../../README.md', 'README.md');
     fs.copyFileSync('../../LICENSE', 'LICENSE');
