@@ -120,6 +120,10 @@ function getWorkspaces(from) {
 
         console.log(`packaging ${w}`);
         await ultraRunner.run(['' /* placeholder */, '' /* placeholder */, '--filter', workspacePkgInfo.pkg.name, '-r', 'npm', 'pack', '--pack-destination', '../core/components']);
+    
+        // hackery.  reset version back to 0.0.0
+        workspacePkgInfo.pkg.version = "0.0.0";
+        workspacePkgInfo.write();
     }
 
     pkgInfo.write();
